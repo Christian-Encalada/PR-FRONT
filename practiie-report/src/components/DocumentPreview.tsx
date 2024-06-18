@@ -1,53 +1,60 @@
-import React, { useEffect, useState } from 'react';
-import mammoth from 'mammoth';
-import PagePreview from './PagePreview';
-import './DocumentPreview.css'; // Importa el archivo CSS
+import React, { useEffect, useRef, useState } from 'react';
+import { renderAsync } from 'docx-preview';
 
 interface DocumentPreviewProps {
   filePath: string;
 }
 
 const DocumentPreview: React.FC<DocumentPreviewProps> = ({ filePath }) => {
-  const [pages, setPages] = useState<string[]>([]);
-  const [currentPage, setCurrentPage] = useState<number>(0);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [doc, setDoc] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(0);
 
   useEffect(() => {
     const fetchDocument = async () => {
       const response = await fetch(filePath);
       const arrayBuffer = await response.arrayBuffer();
-      const result = await mammoth.convertToHtml({ arrayBuffer });
-      const pageSize = 1000; // Aproximadamente 1000 caracteres por página
-      const documentPages = [];
-
-      for (let i = 0; i < result.value.length; i += pageSize) {
-        documentPages.push(result.value.slice(i, i + pageSize));
+      if (containerRef.current) {
+        const document = await renderAsync(arrayBuffer, containerRef.current, undefined, { ignoreWidth: true, ignoreHeight: true });
+        setDoc(document);
       }
-
-      setPages(documentPages);
     };
 
     fetchDocument();
   }, [filePath]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 0) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
   const handleNextPage = () => {
-    if (currentPage < pages.length - 1) {
+    if (doc && currentPage < doc.parts.length - 1) {
       setCurrentPage(currentPage + 1);
     }
   };
 
+  const handlePrevPage = () => {
+    if (doc && currentPage > 0) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  useEffect(() => {
+    if (doc && containerRef.current) {
+      const allPages = containerRef.current.querySelectorAll('.dpx-page');
+      allPages.forEach((page, index) => {
+        if (index === currentPage) {
+          (page as HTMLElement).style.display = 'block';
+        } else {
+          (page as HTMLElement).style.display = 'none';
+        }
+      });
+    }
+  }, [currentPage, doc]);
+
   return (
-    <div className="document-preview">
-      {pages.length > 0 && <PagePreview content={pages[currentPage]} />}
-      <div className="navigation-buttons">
-        <button onClick={handlePreviousPage} disabled={currentPage === 0}>{"<"}</button>
-        <button onClick={handleNextPage} disabled={currentPage === pages.length - 1}>{">"}</button>
+    <div className="document-preview-container">
+      <div className="document-preview-controls">
+        <button onClick={handlePrevPage} disabled={currentPage === 0}>{"<"}</button>
+        <button onClick={handleNextPage} disabled={doc && currentPage === doc.parts.length - 1}>{">"}</button>
       </div>
+      <div className="document-preview" ref={containerRef}></div>
     </div>
   );
 };

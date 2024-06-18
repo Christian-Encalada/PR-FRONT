@@ -17,6 +17,7 @@
     "@types/react-modal": "^3.16.3",
     "axios": "^1.7.2",
     "cors": "^2.8.5",
+    "docx-preview": "^0.3.2",
     "docxtemplater": "^3.47.4",
     "filepond": "^4.31.1",
     "filepond-plugin-file-validate-type": "^1.2.9",

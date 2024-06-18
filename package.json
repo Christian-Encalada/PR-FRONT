@@ -2,7 +2,8 @@
   "dependencies": {
     "primeflex": "^3.3.1",
     "primeicons": "^7.0.0",
-    "primereact": "^10.6.5"
+    "primereact": "^10.6.5",
+    "react-router-dom": "^6.23.1"
   },
   "scripts": {
     "start": "dotenv -e .env react-scripts start",
@@ -11,7 +12,7 @@
     "eject": "react-scripts eject",
     "start-backend": "cd practiiereport/backend/practiie-report-backend && npm start",
     "dev": "concurrently \"npm start\" \"npm run start-backend\""
-},
+  },
   "devDependencies": {
     "dotenv": "^16.4.5"
   }

@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import TemplateWidget from '../utils/widgets/TemplateWidget';
-import AddTemplateModal from '../components/AddTemplateModal';
 import DocumentViewer from '../components/DocumentViewer';
-import { Button } from 'primereact/button';
 
 const HomeView: React.FC = () => {
   const [templates, setTemplates] = useState<{ id: number; name: string; file: File }[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [addTemplateModalVisible, setAddTemplateModalVisible] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState<{ id: number; name: string; file: File } | null>(null);
 
   const userName = localStorage.getItem('userName') || 'Usuario';
@@ -21,23 +18,6 @@ const HomeView: React.FC = () => {
   const closeModal = () => {
     setModalVisible(false);
     setSelectedTemplate(null);
-  };
-
-  const openAddTemplateModal = () => {
-    setAddTemplateModalVisible(true);
-  };
-
-  const closeAddTemplateModal = () => {
-    setAddTemplateModalVisible(false);
-  };
-
-  const handleAddTemplate = (template: { name: string; file: File }) => {
-    const newTemplate = {
-      id: templates.length + 1,
-      name: template.name,
-      file: template.file,
-    };
-    setTemplates([...templates, newTemplate]);
   };
 
   const handleRemoveTemplate = (id: number) => {
@@ -77,13 +57,7 @@ const HomeView: React.FC = () => {
             ))}
           </div>
         </div>
-        <Button label="Agregar Plantilla" onClick={openAddTemplateModal} />
       </div>
-      <AddTemplateModal
-        visible={addTemplateModalVisible}
-        onHide={closeAddTemplateModal}
-        onAdd={handleAddTemplate}
-      />
       {selectedTemplate && (
         <DocumentViewer
           template={selectedTemplate}
@@ -95,6 +69,3 @@ const HomeView: React.FC = () => {
 };
 
 export default HomeView;
-
-
-
